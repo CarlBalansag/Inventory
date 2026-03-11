@@ -7,9 +7,9 @@
   <link rel="stylesheet" href="/css/style.css" />
 </head>
 <body>
-  <%- include('../partials/navbar', { currentUser: currentUser }) %>
+  <%- include('../partials/navbar', { currentUser: locals.currentUser || null }) %>
   <div class="wrap">
-    <%- include('../partials/flash', { success: success, error: error }) %>
+    <%- include('../partials/flash', { success: locals.success || [], error: locals.error || [] }) %>
     <%- body %>
   </div>
 </body>
