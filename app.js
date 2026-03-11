@@ -17,6 +17,9 @@ require('./config/passport');
 //creates express app
 const app = express();
 
+//Tell Express to trust Render's reverse proxy so secure cookies and session work on HTTPS
+app.set('trust proxy', 1);
+
 //Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('MongoDB connected'))
@@ -54,7 +57,12 @@ app.use(
     resave: false,
     saveUninitialized: false,
     store: sessionStore,
-    cookie: { maxAge: 1000 * 60 * 60 * 24 * 7 },
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+      //Only send cookie over HTTPS in production (required for Render's proxy)
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+    },
   })
 );
 
