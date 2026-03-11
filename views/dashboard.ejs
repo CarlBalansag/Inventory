@@ -7,12 +7,8 @@
     <div class="stat-value"><%= totalItems %></div>
   </div>
   <div class="stat">
-    <div class="stat-label">In stock</div>
-    <div class="stat-value"><%= totalItems - totalSold %></div>
-  </div>
-  <div class="stat">
-    <div class="stat-label">Sold</div>
-    <div class="stat-value"><%= totalSold %></div>
+    <div class="stat-label">In stock (units)</div>
+    <div class="stat-value"><%= inStock %></div>
   </div>
   <div class="stat">
     <div class="stat-label">Total profit</div>
@@ -46,7 +42,7 @@
               <td>$<%= item.purchasePrice.toFixed(2) %></td>
               <td>
                 <span class="badge <%= item.isSold ? 'badge-sold' : 'badge-instock' %>">
-                  <%= item.isSold ? 'Sold' : 'In stock' %>
+                  <%= item.isSold ? 'Sold out' : 'In stock' %>
                 </span>
               </td>
             </tr>
@@ -66,12 +62,13 @@
     <% } else { %>
       <table>
         <thead>
-          <tr><th>Item</th><th>Sale price</th><th>Profit</th></tr>
+          <tr><th>Item</th><th>Qty</th><th>Sale price</th><th>Profit</th></tr>
         </thead>
         <tbody>
           <% for (let sale of recentSales) { %>
             <tr>
               <td><a href="/sales/<%= sale._id %>" class="td-link"><%= sale.item ? sale.item.name : 'Deleted' %></a></td>
+              <td class="td-muted"><%= sale.quantitySold || 1 %></td>
               <td>$<%= sale.salePrice.toFixed(2) %></td>
               <td class="<%= sale.profit >= 0 ? 'profit-pos' : 'profit-neg' %>">
                 <%= sale.profit >= 0 ? '+' : '' %>$<%= sale.profit ? sale.profit.toFixed(2) : '0.00' %>

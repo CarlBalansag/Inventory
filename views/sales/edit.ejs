@@ -7,6 +7,7 @@
 <% if (sale.item) { %>
   <div class="note">
     Item: <strong><%= sale.item.name %></strong> — paid $<%= sale.item.purchasePrice.toFixed(2) %>
+    · <strong><%= sale.quantitySold || 1 %> unit(s) sold</strong> in this transaction (cannot be changed)
   </div>
 <% } %>
 
@@ -20,7 +21,7 @@
   <form action="/sales/<%= sale._id %>?_method=PUT" method="POST">
     <div class="form-row">
       <div class="field">
-        <label for="salePrice">Sale price *</label>
+        <label for="salePrice">Sale price (per unit) *</label>
         <div class="prefix-wrap">
           <span class="prefix">$</span>
           <input type="number" id="salePrice" name="salePrice" value="<%= old.salePrice || sale.salePrice %>" required min="0" step="0.01" />

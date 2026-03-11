@@ -25,7 +25,11 @@
       </div>
     </div>
     <div class="detail-field">
-      <div class="label">Sale price</div>
+      <div class="label">Qty sold</div>
+      <div class="value"><%= sale.quantitySold || 1 %></div>
+    </div>
+    <div class="detail-field">
+      <div class="label">Sale price (per unit)</div>
       <div class="value" style="font-weight:600">$<%= sale.salePrice.toFixed(2) %></div>
     </div>
     <div class="detail-field">
@@ -37,7 +41,7 @@
       <div class="value"><%= sale.platformSold %></div>
     </div>
     <div class="detail-field">
-      <div class="label">Profit</div>
+      <div class="label">Total profit</div>
       <div class="value <%= sale.profit >= 0 ? 'profit-pos' : 'profit-neg' %>" style="font-weight:600">
         <%= sale.profit >= 0 ? '+' : '' %>$<%= sale.profit ? sale.profit.toFixed(2) : '0.00' %>
       </div>

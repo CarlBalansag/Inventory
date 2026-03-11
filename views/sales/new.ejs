@@ -5,7 +5,7 @@
 </div>
 
 <% if (items.length === 0) { %>
-  <div class="note">No unsold items in inventory. <a href="/items/new">Add an item</a> first.</div>
+  <div class="note">No items with available stock. <a href="/items/new">Add an item</a> first.</div>
 <% } else { %>
   <div class="form-card">
     <% if (errors && errors.length) { %>
@@ -21,25 +21,36 @@
           <select id="item" name="item" required>
             <option value="">— Select an item —</option>
             <% for (let i of items) { %>
-              <option value="<%= i._id %>" <%= old.item === String(i._id) ? 'selected' : '' %>>
-                <%= i.name %> (paid $<%= i.purchasePrice.toFixed(2) %>)
+              <option
+                value="<%= i._id %>"
+                data-qty="<%= i.availableQty %>"
+                <%= old.item === String(i._id) ? 'selected' : '' %>>
+                <%= i.name %> (paid $<%= i.purchasePrice.toFixed(2) %> · <%= i.availableQty %> available)
               </option>
             <% } %>
           </select>
         </div>
         <div class="field">
-          <label for="salePrice">Sale price *</label>
+          <label for="quantitySold">Quantity *</label>
+          <select id="quantitySold" name="quantitySold" required>
+            <option value="">— Select item first —</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label for="salePrice">Sale price (per unit) *</label>
           <div class="prefix-wrap">
             <span class="prefix">$</span>
             <input type="number" id="salePrice" name="salePrice" value="<%= old.salePrice || '' %>" required min="0" step="0.01" placeholder="0.00" />
           </div>
         </div>
-      </div>
-      <div class="form-row">
         <div class="field">
           <label for="saleDate">Sale date *</label>
           <input type="date" id="saleDate" name="saleDate" value="<%= old.saleDate || '' %>" required />
         </div>
+      </div>
+      <div class="form-row form-row-full">
         <div class="field">
           <label for="platformSold">Platform *</label>
           <input type="text" id="platformSold" name="platformSold" value="<%= old.platformSold || '' %>" placeholder="e.g. eBay, Mercari, StockX" required />
@@ -57,4 +68,43 @@
       </div>
     </form>
   </div>
+
+  <script>
+    (function () {
+      var itemSelect = document.getElementById('item');
+      var qtySelect  = document.getElementById('quantitySold');
+      var oldQty     = '<%= old.quantitySold || "" %>';
+
+      function buildQtyOptions(max) {
+        qtySelect.innerHTML = '';
+        if (!max || max < 1) {
+          var opt = document.createElement('option');
+          opt.value = '';
+          opt.textContent = '— Select item first —';
+          qtySelect.appendChild(opt);
+          return;
+        }
+        for (var i = 1; i <= max; i++) {
+          var opt = document.createElement('option');
+          opt.value = i;
+          opt.textContent = i;
+          if (String(i) === oldQty) opt.selected = true;
+          qtySelect.appendChild(opt);
+        }
+      }
+
+      itemSelect.addEventListener('change', function () {
+        var selected = itemSelect.options[itemSelect.selectedIndex];
+        var qty = parseInt(selected.dataset.qty) || 0;
+        buildQtyOptions(qty);
+        oldQty = ''; // clear old qty after first change so it doesn't stick
+      });
+
+      // On page load, if an item is already selected (e.g. after validation error) rebuild the dropdown
+      if (itemSelect.value) {
+        var selected = itemSelect.options[itemSelect.selectedIndex];
+        buildQtyOptions(parseInt(selected.dataset.qty) || 0);
+      }
+    })();
+  </script>
 <% } %>

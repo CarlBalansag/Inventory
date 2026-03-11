@@ -23,6 +23,7 @@
       <thead>
         <tr>
           <th>Item</th>
+          <th>Qty</th>
           <th>Sale price</th>
           <th>Date</th>
           <th>Platform</th>
@@ -34,6 +35,7 @@
         <% for (let sale of sales) { %>
           <tr>
             <td><a href="/sales/<%= sale._id %>" class="td-link"><%= sale.item ? sale.item.name : 'Deleted item' %></a></td>
+            <td class="td-muted"><%= sale.quantitySold || 1 %></td>
             <td>$<%= sale.salePrice.toFixed(2) %></td>
             <td class="td-muted"><%= sale.saleDate.toLocaleDateString() %></td>
             <td class="td-muted"><%= sale.platformSold %></td>

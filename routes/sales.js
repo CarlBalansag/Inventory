@@ -12,6 +12,9 @@ const saleRules = [ //Creating sales
   body('salePrice')
     .isFloat({ min: 0 })
     .withMessage('Sale price must be a positive number.'),
+  body('quantitySold')
+    .isInt({ min: 1 })
+    .withMessage('Quantity must be at least 1.'),
   body('saleDate')
     .isDate()
     .withMessage('Sale date is required.'),
