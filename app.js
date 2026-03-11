@@ -9,7 +9,7 @@ const flash = require('connect-flash');
 const passport = require('passport');
 const helmet = require('helmet');
 const methodOverride = require('method-override');
-const xss = require('xss-clean');
+
 
 //runs passport file, registers LocalStrategy, serialize and deserialize
 require('./config/passport');
@@ -39,8 +39,6 @@ app.use(express.json());
 //to be able to let req.body have data without it would be empty 
 app.use(methodOverride('_method'));
 
-//Sanitizes user input to prevent cross-site scripting attacks
-app.use(xss());
 
 //Static files, make everything in the public folder static files
 app.use(express.static(path.join(__dirname, 'public')));
