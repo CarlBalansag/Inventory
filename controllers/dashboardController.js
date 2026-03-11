@@ -37,13 +37,28 @@ exports.getDashboard = async (req, res) => {
   const totalSoldQty   = totalSoldQtyAgg.length ? totalSoldQtyAgg[0].total : 0;
   const inStock        = totalQty - totalSoldQty; //Units currently available across all items
 
+  //Compute available qty for each recent item
+  const recentItemIds = recentItems.map((i) => i._id);
+  const recentSalesCounts = await Sale.aggregate([
+    { $match: { item: { $in: recentItemIds } } },
+    { $group: { _id: '$item', sold: { $sum: '$quantitySold' } } },
+  ]);
+  const soldByItem = {};
+  for (const s of recentSalesCounts) soldByItem[s._id.toString()] = s.sold;
+
+  const recentItemsWithQty = recentItems.map((item) => ({
+    ...item.toObject(),
+    _id: item._id,
+    availableQty: Math.max(0, (item.quantity || 1) - (soldByItem[item._id.toString()] || 0)),
+  }));
+
   res.render('dashboard', {
     title: 'Dashboard',
     totalItems,
     inStock,
     totalProfit,
     inventoryCost,
-    recentItems,
+    recentItems: recentItemsWithQty,
     recentSales,
   });
 };

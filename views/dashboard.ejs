@@ -33,13 +33,14 @@
     <% } else { %>
       <table>
         <thead>
-          <tr><th>Name</th><th>Paid</th><th>Status</th></tr>
+          <tr><th>Name</th><th>Paid</th><th>Available</th><th>Status</th></tr>
         </thead>
         <tbody>
           <% for (let item of recentItems) { %>
             <tr>
               <td><a href="/items/<%= item._id %>" class="td-link"><%= item.name %></a></td>
               <td>$<%= item.purchasePrice.toFixed(2) %></td>
+              <td class="td-muted"><%= item.availableQty %></td>
               <td>
                 <span class="badge <%= item.isSold ? 'badge-sold' : 'badge-instock' %>">
                   <%= item.isSold ? 'Sold out' : 'In stock' %>
