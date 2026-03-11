@@ -1,0 +1,32 @@
+<% layout('layout/boilerplate') %>
+<div class="auth-wrap">
+  <div class="auth-card">
+    <h1 class="auth-title">Create account</h1>
+    <p class="auth-sub">Takes 30 seconds.</p>
+
+    <% if (errors && errors.length) { %>
+      <div class="form-errors">
+        <% for (let e of errors) { %><p class="form-error"><%= e.msg %></p><% } %>
+      </div>
+    <% } %>
+
+    <form action="/auth/register" method="POST" class="auth-fields">
+      <div class="field">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" value="<%= old.username || '' %>" required autocomplete="username" />
+      </div>
+      <div class="field">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" value="<%= old.email || '' %>" required autocomplete="email" />
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required autocomplete="new-password" />
+        <span class="field-hint">At least 6 characters.</span>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">Create account</button>
+    </form>
+
+    <p class="auth-foot">Already have an account? <a href="/auth/login">Log in</a></p>
+  </div>
+</div>

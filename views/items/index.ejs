@@ -1,0 +1,108 @@
+<% layout('layout/boilerplate') %>
+<div class="page-header">
+  <h1 class="page-title" style="margin:0">Inventory</h1>
+  <a href="/items/new" class="btn btn-primary">Add item</a>
+</div>
+
+<div class="filters">
+  <form action="/items" method="GET" style="display:contents;">
+    <input type="text" name="search" value="<%= search %>" placeholder="Search by name..." onchange="this.form.submit()" />
+    <input type="hidden" name="sort" value="<%= sort %>" />
+    <input type="hidden" name="filter" value="<%= filter %>" />
+  </form>
+
+  <div class="filter-btn-wrap">
+    <button class="btn btn-outline" id="filterToggle">
+      Filter<% if (sort || filter) { %> ·<% } %>
+      <% if (filter === 'unsold') { %> In stock<% } else if (filter === 'sold') { %> Sold<% } %>
+      <% if (sort === 'purchaseDate') { %> · Purchase date<% } else if (sort === 'purchasePrice') { %> · Price<% } else if (!filter && !sort) { %><% } %>
+    </button>
+    <div class="filter-dropdown" id="filterDropdown">
+      <div class="filter-group-label">Show</div>
+      <a href="/items?search=<%= search %>&sort=<%= sort %>&filter=" class="filter-option <%= filter === '' ? 'active' : '' %>">All</a>
+      <a href="/items?search=<%= search %>&sort=<%= sort %>&filter=unsold" class="filter-option <%= filter === 'unsold' ? 'active' : '' %>">In stock</a>
+      <a href="/items?search=<%= search %>&sort=<%= sort %>&filter=sold" class="filter-option <%= filter === 'sold' ? 'active' : '' %>">Sold</a>
+      <div class="filter-divider"></div>
+      <div class="filter-group-label">Sort by</div>
+      <a href="/items?search=<%= search %>&sort=&filter=<%= filter %>" class="filter-option <%= sort === '' ? 'active' : '' %>">Newest first</a>
+      <a href="/items?search=<%= search %>&sort=purchaseDate&filter=<%= filter %>" class="filter-option <%= sort === 'purchaseDate' ? 'active' : '' %>">Purchase date</a>
+      <a href="/items?search=<%= search %>&sort=purchasePrice&filter=<%= filter %>" class="filter-option <%= sort === 'purchasePrice' ? 'active' : '' %>">Purchase price</a>
+    </div>
+  </div>
+
+  <% if (search || sort || filter) { %>
+    <a href="/items" class="btn btn-ghost">Clear</a>
+  <% } %>
+</div>
+
+<% if (items.length === 0) { %>
+  <div class="table-wrap">
+    <div class="empty">No items found. <a href="/items/new">Add one</a>.</div>
+  </div>
+<% } else { %>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Date Purchased</th>
+          <th>Purchase Price</th>
+          <th>Qty Purchased</th>
+          <th>Qty Available</th>
+          <th>Total Cost</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% for (let item of items) { %>
+          <tr>
+            <td><a href="/items/<%= item._id %>" class="td-link"><%= item.name %></a></td>
+            <td class="td-muted"><%= new Date(item.purchaseDate).toLocaleDateString() %></td>
+            <td>$<%= item.purchasePrice.toFixed(2) %></td>
+            <td class="td-muted"><%= item.quantity || 1 %></td>
+            <td>
+              <span class="badge <%= item.quantityAvailable === 0 ? 'badge-sold' : 'badge-instock' %>">
+                <%= item.quantityAvailable %>
+              </span>
+            </td>
+            <td>$<%= item.totalCost.toFixed(2) %></td>
+            <td>
+              <div class="actions">
+                <a href="/items/<%= item._id %>/edit" class="btn btn-sm btn-outline">Edit</a>
+                <form action="/items/<%= item._id %>?_method=DELETE" method="POST" onsubmit="return confirm('Delete this item?');" style="display:inline;">
+                  <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+
+  <% if (totalPages > 1) { %>
+    <div class="pagination">
+      <% if (page > 1) { %>
+        <a href="/items?page=<%= page - 1 %>&search=<%= search %>&sort=<%= sort %>&filter=<%= filter %>" class="btn btn-sm btn-outline">Prev</a>
+      <% } %>
+      <span>Page <%= page %> of <%= totalPages %></span>
+      <% if (page < totalPages) { %>
+        <a href="/items?page=<%= page + 1 %>&search=<%= search %>&sort=<%= sort %>&filter=<%= filter %>" class="btn btn-sm btn-outline">Next</a>
+      <% } %>
+    </div>
+  <% } %>
+<% } %>
+
+<script>
+(function () {
+  var btn = document.getElementById('filterToggle');
+  var dd = document.getElementById('filterDropdown');
+  if (!btn || !dd) return;
+  btn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    dd.classList.toggle('open');
+  });
+  document.addEventListener('click', function () { dd.classList.remove('open'); });
+  dd.addEventListener('click', function (e) { e.stopPropagation(); });
+})();
+</script>

@@ -1,0 +1,114 @@
+<nav class="nav">
+  <a href="/" class="nav-brand">Inventory</a>
+  <% if (currentUser) { %>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Dashboard</a>
+      <a href="/items" class="nav-link">Inventory</a>
+      <a href="/sales" class="nav-link">Sales</a>
+    </div>
+    <div class="nav-right">
+      <span class="nav-user"><%= currentUser.username %></span>
+      <div class="nav-settings-wrap">
+        <button class="nav-settings-btn" id="settingsToggle" aria-label="Settings">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M6.5 1a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5v.8a5.5 5.5 0 0 1 1.16.48l.57-.57a.5.5 0 0 1 .7 0l1.42 1.42a.5.5 0 0 1 0 .7l-.57.57A5.5 5.5 0 0 1 13.2 5.5h.8a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5h-.8a5.5 5.5 0 0 1-.48 1.16l.57.57a.5.5 0 0 1 0 .7l-1.42 1.42a.5.5 0 0 1-.7 0l-.57-.57A5.5 5.5 0 0 1 9 12.2v.8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-.8a5.5 5.5 0 0 1-1.16-.48l-.57.57a.5.5 0 0 1-.7 0L2.15 11.1a.5.5 0 0 1 0-.7l.57-.57A5.5 5.5 0 0 1 2.3 8.5H1.5A.5.5 0 0 1 1 8V6a.5.5 0 0 1 .5-.5h.8a5.5 5.5 0 0 1 .48-1.16l-.57-.57a.5.5 0 0 1 0-.7L3.63 1.65a.5.5 0 0 1 .7 0l.57.57A5.5 5.5 0 0 1 6.5 1.8V1zM8 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4z" fill="currentColor"/>
+          </svg>
+        </button>
+        <div class="settings-dropdown" id="settingsDropdown">
+          <div class="settings-section-title">Cards</div>
+          <div id="cardsList">
+            <% if (typeof userCards !== 'undefined' && userCards.length) { %>
+              <% for (let card of userCards) { %>
+                <div class="settings-card-item" data-id="<%= card._id %>">
+                  <span><%= card.nickname %></span>
+                  <button type="button" class="settings-card-del" title="Remove" data-id="<%= card._id %>">×</button>
+                </div>
+              <% } %>
+            <% } else { %>
+              <div class="settings-empty" id="noCardsMsg">No cards yet. Add one below.</div>
+            <% } %>
+          </div>
+          <form id="addCardForm" class="settings-add-form">
+            <input type="text" id="cardNicknameInput" placeholder="Card nickname" class="settings-input" required />
+            <button type="submit" class="btn btn-primary btn-sm">Add</button>
+          </form>
+        </div>
+      </div>
+      <a href="/auth/logout" class="nav-logout">Log out</a>
+    </div>
+  <% } else { %>
+    <div class="nav-right">
+      <a href="/auth/login" class="nav-link">Log in</a>
+      <a href="/auth/register" class="btn btn-primary btn-sm">Register</a>
+    </div>
+  <% } %>
+</nav>
+
+<script>
+(function () {
+  var btn = document.getElementById('settingsToggle');
+  var dropdown = document.getElementById('settingsDropdown');
+  if (!btn || !dropdown) return;
+
+  // Toggle open/close
+  btn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    dropdown.classList.toggle('open');
+  });
+  document.addEventListener('click', function () {
+    dropdown.classList.remove('open');
+  });
+  dropdown.addEventListener('click', function (e) {
+    e.stopPropagation();
+  });
+
+  // Add card
+  var addForm = document.getElementById('addCardForm');
+  var input = document.getElementById('cardNicknameInput');
+  addForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var nickname = input.value.trim();
+    if (!nickname) return;
+    fetch('/cards', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nickname: nickname })
+    })
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+      if (data.error) return;
+      var list = document.getElementById('cardsList');
+      var empty = document.getElementById('noCardsMsg');
+      if (empty) empty.remove();
+      var item = document.createElement('div');
+      item.className = 'settings-card-item';
+      item.dataset.id = data.card._id;
+      item.innerHTML = '<span>' + data.card.nickname + '</span><button type="button" class="settings-card-del" title="Remove" data-id="' + data.card._id + '">\u00d7</button>';
+      list.appendChild(item);
+      input.value = '';
+    });
+  });
+
+  // Delete card (delegated)
+  document.getElementById('cardsList').addEventListener('click', function (e) {
+    var delBtn = e.target.closest('.settings-card-del');
+    if (!delBtn) return;
+    var id = delBtn.dataset.id;
+    fetch('/cards/' + id + '?_method=DELETE', { method: 'POST' })
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+      if (data.error) return;
+      var item = document.querySelector('.settings-card-item[data-id="' + id + '"]');
+      if (item) item.remove();
+      var list = document.getElementById('cardsList');
+      if (!list.querySelector('.settings-card-item')) {
+        var empty = document.createElement('div');
+        empty.className = 'settings-empty';
+        empty.id = 'noCardsMsg';
+        empty.textContent = 'No cards yet.';
+        list.appendChild(empty);
+      }
+    });
+  });
+})();
+</script>

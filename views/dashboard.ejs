@@ -1,0 +1,85 @@
+<% layout('layout/boilerplate') %>
+<h1 class="page-title">Dashboard</h1>
+
+<div class="stats" style="grid-template-columns:repeat(5,1fr)">
+  <div class="stat">
+    <div class="stat-label">Total items</div>
+    <div class="stat-value"><%= totalItems %></div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">In stock</div>
+    <div class="stat-value"><%= totalItems - totalSold %></div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Sold</div>
+    <div class="stat-value"><%= totalSold %></div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Total profit</div>
+    <div class="stat-value <%= totalProfit >= 0 ? 'profit-pos' : 'profit-neg' %>">
+      <%= totalProfit >= 0 ? '+' : '' %>$<%= totalProfit.toFixed(2) %>
+    </div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Inventory cost</div>
+    <div class="stat-value">$<%= inventoryCost.toFixed(2) %></div>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+  <div class="section">
+    <div class="section-head">
+      <h2>Recent inventory</h2>
+      <a href="/items" class="btn btn-ghost btn-sm">View all</a>
+    </div>
+    <% if (recentItems.length === 0) { %>
+      <div class="empty">Nothing yet. <a href="/items/new">Add an item</a>.</div>
+    <% } else { %>
+      <table>
+        <thead>
+          <tr><th>Name</th><th>Paid</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <% for (let item of recentItems) { %>
+            <tr>
+              <td><a href="/items/<%= item._id %>" class="td-link"><%= item.name %></a></td>
+              <td>$<%= item.purchasePrice.toFixed(2) %></td>
+              <td>
+                <span class="badge <%= item.isSold ? 'badge-sold' : 'badge-instock' %>">
+                  <%= item.isSold ? 'Sold' : 'In stock' %>
+                </span>
+              </td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    <% } %>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <h2>Recent sales</h2>
+      <a href="/sales" class="btn btn-ghost btn-sm">View all</a>
+    </div>
+    <% if (recentSales.length === 0) { %>
+      <div class="empty">No sales yet. <a href="/sales/new">Record one</a>.</div>
+    <% } else { %>
+      <table>
+        <thead>
+          <tr><th>Item</th><th>Sale price</th><th>Profit</th></tr>
+        </thead>
+        <tbody>
+          <% for (let sale of recentSales) { %>
+            <tr>
+              <td><a href="/sales/<%= sale._id %>" class="td-link"><%= sale.item ? sale.item.name : 'Deleted' %></a></td>
+              <td>$<%= sale.salePrice.toFixed(2) %></td>
+              <td class="<%= sale.profit >= 0 ? 'profit-pos' : 'profit-neg' %>">
+                <%= sale.profit >= 0 ? '+' : '' %>$<%= sale.profit ? sale.profit.toFixed(2) : '0.00' %>
+              </td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    <% } %>
+  </div>
+</div>

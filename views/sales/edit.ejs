@@ -1,0 +1,51 @@
+<% layout('layout/boilerplate') %>
+<div class="page-header">
+  <h1 class="page-title" style="margin:0">Edit sale</h1>
+  <a href="/sales/<%= sale._id %>" class="btn btn-ghost">Cancel</a>
+</div>
+
+<% if (sale.item) { %>
+  <div class="note">
+    Item: <strong><%= sale.item.name %></strong> — paid $<%= sale.item.purchasePrice.toFixed(2) %>
+  </div>
+<% } %>
+
+<div class="form-card">
+  <% if (errors && errors.length) { %>
+    <div class="form-errors">
+      <% for (let e of errors) { %><p class="form-error"><%= e.msg %></p><% } %>
+    </div>
+  <% } %>
+
+  <form action="/sales/<%= sale._id %>?_method=PUT" method="POST">
+    <div class="form-row">
+      <div class="field">
+        <label for="salePrice">Sale price *</label>
+        <div class="prefix-wrap">
+          <span class="prefix">$</span>
+          <input type="number" id="salePrice" name="salePrice" value="<%= old.salePrice || sale.salePrice %>" required min="0" step="0.01" />
+        </div>
+      </div>
+      <div class="field">
+        <label for="saleDate">Sale date *</label>
+        <input type="date" id="saleDate" name="saleDate" value="<%= old.saleDate ? new Date(old.saleDate).toISOString().split('T')[0] : new Date(sale.saleDate).toISOString().split('T')[0] %>" required />
+      </div>
+    </div>
+    <div class="form-row form-row-full">
+      <div class="field">
+        <label for="platformSold">Platform *</label>
+        <input type="text" id="platformSold" name="platformSold" value="<%= old.platformSold || sale.platformSold %>" required />
+      </div>
+    </div>
+    <div class="form-row form-row-full">
+      <div class="field">
+        <label for="buyerNotes">Buyer notes</label>
+        <textarea id="buyerNotes" name="buyerNotes"><%= old.buyerNotes !== undefined ? old.buyerNotes : (sale.buyerNotes || '') %></textarea>
+      </div>
+    </div>
+    <div class="form-footer">
+      <a href="/sales/<%= sale._id %>" class="btn btn-ghost">Cancel</a>
+      <button type="submit" class="btn btn-primary">Save changes</button>
+    </div>
+  </form>
+</div>

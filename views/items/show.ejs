@@ -1,0 +1,92 @@
+<% layout('layout/boilerplate') %>
+<div class="page-header">
+  <div>
+    <a href="/items" class="btn btn-ghost btn-sm" style="margin-bottom:8px;display:inline-block;">← Back</a>
+    <h1 class="page-title" style="margin:0"><%= item.name %></h1>
+  </div>
+  <div class="actions">
+    <a href="/items/<%= item._id %>/edit" class="btn btn-outline">Edit</a>
+    <form action="/items/<%= item._id %>?_method=DELETE" method="POST" onsubmit="return confirm('Delete this item?');" style="display:inline;">
+      <button type="submit" class="btn btn-danger">Delete</button>
+    </form>
+  </div>
+</div>
+
+<div class="detail-card">
+  <div class="detail-grid">
+    <div class="detail-field">
+      <div class="label">Category</div>
+      <div class="value"><%= item.category || '—' %></div>
+    </div>
+    <div class="detail-field">
+      <div class="label">Purchase price</div>
+      <div class="value" style="font-weight:600">$<%= item.purchasePrice.toFixed(2) %></div>
+    </div>
+    <div class="detail-field">
+      <div class="label">Purchase date</div>
+      <div class="value"><%= item.purchaseDate.toLocaleDateString() %></div>
+    </div>
+    <div class="detail-field">
+      <div class="label">Platform</div>
+      <div class="value"><%= item.platformBought %></div>
+    </div>
+    <div class="detail-field">
+      <div class="label">Condition</div>
+      <div class="value"><span class="badge badge-cond"><%= item.condition %></span></div>
+    </div>
+    <div class="detail-field">
+      <div class="label">Quantity</div>
+      <div class="value"><%= item.quantity || 1 %></div>
+    </div>
+    <div class="detail-field">
+      <div class="label">Tax</div>
+      <div class="value">$<%= (item.tax || 0).toFixed(2) %></div>
+    </div>
+    <div class="detail-field">
+      <div class="label">Card used</div>
+      <div class="value"><%= item.cardUsed || '—' %></div>
+    </div>
+    <div class="detail-field">
+      <div class="label">Purchase link</div>
+      <div class="value">
+        <% if (item.purchaseLink) { %>
+          <a href="<%= item.purchaseLink %>" target="_blank" rel="noopener noreferrer" style="color:var(--text);text-decoration:underline;">View listing</a>
+        <% } else { %>
+          —
+        <% } %>
+      </div>
+    </div>
+    <div class="detail-field">
+      <div class="label">Status</div>
+      <div class="value">
+        <span class="badge <%= item.isSold ? 'badge-sold' : 'badge-instock' %>">
+          <%= item.isSold ? 'Sold' : 'In stock' %>
+        </span>
+      </div>
+    </div>
+    <div class="detail-field">
+      <div class="label">Added</div>
+      <div class="value"><%= item.createdAt.toLocaleDateString() %></div>
+    </div>
+  </div>
+
+  <% if (item.tags && item.tags.length) { %>
+    <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
+      <div class="label" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-faint);margin-bottom:6px">Tags</div>
+      <div class="tags">
+        <% for (let tag of item.tags) { %><span class="tag"><%= tag %></span><% } %>
+      </div>
+    </div>
+  <% } %>
+
+  <% if (item.notes) { %>
+    <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
+      <div class="label" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-faint);margin-bottom:6px">Notes</div>
+      <div style="font-size:13px;color:var(--text-muted);line-height:1.6"><%= item.notes %></div>
+    </div>
+  <% } %>
+</div>
+
+<% if (!item.isSold) { %>
+  <a href="/sales/new" class="btn btn-primary">Record a sale for this item</a>
+<% } %>

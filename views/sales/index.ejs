@@ -1,0 +1,68 @@
+<% layout('layout/boilerplate') %>
+<div class="page-header">
+  <h1 class="page-title" style="margin:0">Sales</h1>
+  <a href="/sales/new" class="btn btn-primary">Record sale</a>
+</div>
+
+<form action="/sales" method="GET" class="filters">
+  <select name="sort">
+    <option value="" <%= sort === '' ? 'selected' : '' %>>Newest first</option>
+    <option value="saleDate" <%= sort === 'saleDate' ? 'selected' : '' %>>Sale date</option>
+    <option value="profit" <%= sort === 'profit' ? 'selected' : '' %>>Profit</option>
+  </select>
+  <button type="submit" class="btn btn-outline">Sort</button>
+</form>
+
+<% if (sales.length === 0) { %>
+  <div class="table-wrap">
+    <div class="empty">No sales recorded yet. <a href="/sales/new">Record one</a>.</div>
+  </div>
+<% } else { %>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Sale price</th>
+          <th>Date</th>
+          <th>Platform</th>
+          <th>Profit</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% for (let sale of sales) { %>
+          <tr>
+            <td><a href="/sales/<%= sale._id %>" class="td-link"><%= sale.item ? sale.item.name : 'Deleted item' %></a></td>
+            <td>$<%= sale.salePrice.toFixed(2) %></td>
+            <td class="td-muted"><%= sale.saleDate.toLocaleDateString() %></td>
+            <td class="td-muted"><%= sale.platformSold %></td>
+            <td class="<%= sale.profit >= 0 ? 'profit-pos' : 'profit-neg' %>">
+              <%= sale.profit >= 0 ? '+' : '' %>$<%= sale.profit ? sale.profit.toFixed(2) : '0.00' %>
+            </td>
+            <td>
+              <div class="actions">
+                <a href="/sales/<%= sale._id %>/edit" class="btn btn-sm btn-outline">Edit</a>
+                <form action="/sales/<%= sale._id %>?_method=DELETE" method="POST" onsubmit="return confirm('Delete this sale?');" style="display:inline;">
+                  <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+
+  <% if (totalPages > 1) { %>
+    <div class="pagination">
+      <% if (page > 1) { %>
+        <a href="/sales?page=<%= page - 1 %>&sort=<%= sort %>" class="btn btn-sm btn-outline">Prev</a>
+      <% } %>
+      <span>Page <%= page %> of <%= totalPages %></span>
+      <% if (page < totalPages) { %>
+        <a href="/sales?page=<%= page + 1 %>&sort=<%= sort %>" class="btn btn-sm btn-outline">Next</a>
+      <% } %>
+    </div>
+  <% } %>
+<% } %>

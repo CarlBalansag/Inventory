@@ -1,0 +1,102 @@
+<% layout('layout/boilerplate') %>
+<div class="page-header">
+  <h1 class="page-title" style="margin:0">Add item</h1>
+  <a href="/items" class="btn btn-ghost">Cancel</a>
+</div>
+
+<div class="form-card">
+  <% if (errors && errors.length) { %>
+    <div class="form-errors">
+      <% for (let e of errors) { %><p class="form-error"><%= e.msg %></p><% } %>
+    </div>
+  <% } %>
+
+  <form action="/items" method="POST" autocomplete="off">
+    <div class="form-row">
+      <div class="field">
+        <label for="name">Item name *</label>
+        <input type="text" id="name" name="name" value="<%= old.name || '' %>" required />
+      </div>
+      <div class="field">
+        <label for="category">Category</label>
+        <input type="text" id="category" name="category" value="<%= old.category || '' %>" placeholder="e.g. Sneakers, Electronics" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label for="purchasePrice">Purchase price *</label>
+        <div class="prefix-wrap">
+          <span class="prefix">$</span>
+          <input type="number" id="purchasePrice" name="purchasePrice" value="<%= old.purchasePrice || '' %>" required min="0" step="0.01" placeholder="0.00" />
+        </div>
+      </div>
+      <div class="field">
+        <label for="purchaseDate">Purchase date *</label>
+        <input type="date" id="purchaseDate" name="purchaseDate" value="<%= old.purchaseDate ? new Date(old.purchaseDate).toISOString().split('T')[0] : '' %>" required />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label for="quantity">Quantity</label>
+        <input type="number" id="quantity" name="quantity" value="<%= old.quantity || 1 %>" min="1" step="1" />
+      </div>
+      <div class="field">
+        <label for="tax">Tax</label>
+        <div class="prefix-wrap">
+          <span class="prefix">$</span>
+          <input type="number" id="tax" name="tax" value="<%= old.tax || '' %>" min="0" step="0.01" placeholder="0.00" />
+        </div>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label for="platformBought">Platform *</label>
+        <input type="text" id="platformBought" name="platformBought" value="<%= old.platformBought || '' %>" placeholder="e.g. eBay, StockX, Retail" required />
+      </div>
+      <div class="field">
+        <label for="condition">Condition</label>
+        <select id="condition" name="condition">
+          <% ['New', 'Like New', 'Good', 'Fair', 'Poor'].forEach(c => { %>
+            <option value="<%= c %>" <%= (old.condition === c || (!old.condition && c === 'Good')) ? 'selected' : '' %>><%= c %></option>
+          <% }) %>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label for="cardUsed">Card used</label>
+        <select id="cardUsed" name="cardUsed">
+          <option value="">— None —</option>
+          <% if (userCards && userCards.length) { %>
+            <% for (let card of userCards) { %>
+              <option value="<%= card.nickname %>" <%= old.cardUsed === card.nickname ? 'selected' : '' %>><%= card.nickname %></option>
+            <% } %>
+          <% } else { %>
+            <option value="" disabled>No cards yet — use the ⚙ gear icon to add one</option>
+          <% } %>
+        </select>
+      </div>
+      <div class="field">
+        <label for="purchaseLink">Purchase link</label>
+        <input type="url" id="purchaseLink" name="purchaseLink" value="<%= old.purchaseLink || '' %>" placeholder="https://..." />
+      </div>
+    </div>
+    <div class="form-row form-row-full">
+      <div class="field">
+        <label for="tags">Tags</label>
+        <input type="text" id="tags" name="tags" value="<%= old.tags || '' %>" placeholder="Comma separated: sneakers, limited, resell" />
+        <span class="field-hint">Separate with commas.</span>
+      </div>
+    </div>
+    <div class="form-row form-row-full">
+      <div class="field">
+        <label for="notes">Notes</label>
+        <textarea id="notes" name="notes"><%= old.notes || '' %></textarea>
+      </div>
+    </div>
+    <div class="form-footer">
+      <a href="/items" class="btn btn-ghost">Cancel</a>
+      <button type="submit" class="btn btn-primary">Add item</button>
+    </div>
+  </form>
+</div>

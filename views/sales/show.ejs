@@ -1,0 +1,57 @@
+<% layout('layout/boilerplate') %>
+<div class="page-header">
+  <div>
+    <a href="/sales" class="btn btn-ghost btn-sm" style="margin-bottom:8px;display:inline-block;">← Back</a>
+    <h1 class="page-title" style="margin:0">Sale details</h1>
+  </div>
+  <div class="actions">
+    <a href="/sales/<%= sale._id %>/edit" class="btn btn-outline">Edit</a>
+    <form action="/sales/<%= sale._id %>?_method=DELETE" method="POST" onsubmit="return confirm('Delete this sale?');" style="display:inline;">
+      <button type="submit" class="btn btn-danger">Delete</button>
+    </form>
+  </div>
+</div>
+
+<div class="detail-card">
+  <div class="detail-grid">
+    <div class="detail-field">
+      <div class="label">Item</div>
+      <div class="value">
+        <% if (sale.item) { %>
+          <a href="/items/<%= sale.item._id %>" style="color:var(--text);text-decoration:underline"><%= sale.item.name %></a>
+        <% } else { %>
+          Deleted item
+        <% } %>
+      </div>
+    </div>
+    <div class="detail-field">
+      <div class="label">Sale price</div>
+      <div class="value" style="font-weight:600">$<%= sale.salePrice.toFixed(2) %></div>
+    </div>
+    <div class="detail-field">
+      <div class="label">Sale date</div>
+      <div class="value"><%= sale.saleDate.toLocaleDateString() %></div>
+    </div>
+    <div class="detail-field">
+      <div class="label">Platform</div>
+      <div class="value"><%= sale.platformSold %></div>
+    </div>
+    <div class="detail-field">
+      <div class="label">Profit</div>
+      <div class="value <%= sale.profit >= 0 ? 'profit-pos' : 'profit-neg' %>" style="font-weight:600">
+        <%= sale.profit >= 0 ? '+' : '' %>$<%= sale.profit ? sale.profit.toFixed(2) : '0.00' %>
+      </div>
+    </div>
+    <div class="detail-field">
+      <div class="label">Recorded</div>
+      <div class="value"><%= sale.createdAt.toLocaleDateString() %></div>
+    </div>
+  </div>
+
+  <% if (sale.buyerNotes) { %>
+    <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
+      <div class="label" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-faint);margin-bottom:6px">Buyer notes</div>
+      <div style="font-size:13px;color:var(--text-muted);line-height:1.6"><%= sale.buyerNotes %></div>
+    </div>
+  <% } %>
+</div>
