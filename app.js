@@ -22,7 +22,11 @@ const app = express();
 app.set('trust proxy', 1);
 
 //Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI)
+let mongoURL = process.env.MONGODB_URI;
+if (process.env.NODE_ENV === "test") {
+  mongoURL = process.env.MONGODB_URI_TEST;
+}
+mongoose.connect(mongoURL)
   .then(() => console.log('MongoDB connected'))
   .catch((err) => console.error('MongoDB error:', err));
 
@@ -49,7 +53,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 //Creates a MongoDB-backed session store and dont update the session record more than once every 24 hours
 const sessionStore = MongoStore
-  .create({ mongoUrl: process.env.MONGODB_URI, touchAfter: 24 * 3600 });
+  .create({ mongoUrl: mongoURL, touchAfter: 24 * 3600 });
   sessionStore.on('error', (err) => console.error('Session store error:', err.message));
 
 app.use(
@@ -90,8 +94,26 @@ app.use(async (req, res, next) => {
   }
   next();
 });
-
 //Routes
+app.use((req, res, next) => {
+  if (req.path === "/multiply") {
+    res.set("Content-Type", "application/json");
+  } else {
+    res.set("Content-Type", "text/html");
+  }
+  next();
+});
+
+app.get("/multiply", (req, res) => {
+  let result = req.query.first * req.query.second;
+  if (Number.isNaN(result)) {
+    result = "NaN";
+  } else if (result == null) {
+    result = "null";
+  }
+  res.json({ result: result });
+});
+
 app.use('/', require('./routes/dashboard'));
 app.use('/auth', require('./routes/auth'));
 app.use('/items', require('./routes/items'));
